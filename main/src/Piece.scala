@@ -1,0 +1,18 @@
+class Piece(val left: Char, val bottom: Char, val right: Char, private var pos: Int) {
+  private var coords: Option[(Int, Int)] = None
+  def position = this.pos
+
+  def getCoords = this.coords.getOrElse(-1, -1)
+
+  def addCoords(y: Int, x: Int) = this.coords = Some(y, x)
+
+  def removeCoords() = this.coords = None
+
+  def rotate() = if (this.pos == 6) {this.pos = 1} else {this.pos += 1}
+
+  def samePiece(x: Piece) = {
+   this.left == x.left && this.bottom == x.bottom && this.right == x.right
+  }
+
+}
+
