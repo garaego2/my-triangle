@@ -13,6 +13,15 @@ class Piece(val left: Char, val bottom: Char, val right: Char, private var pos: 
   def samePiece(x: Piece) = {
    this.left == x.left && this.bottom == x.bottom && this.right == x.right
   }
-
+  def convertPos = {
+    this.pos match {
+      case 1 => (left, right, 'O', bottom)  //(left, right, up, down)
+      case 3 => (bottom, left, 'O', right)
+      case 5 => (right, bottom, 'O', left)
+      case 2 => (bottom, right, left, 'O')
+      case 4 => (right, left, bottom, 'O')
+      case 6 => (left, bottom, right, 'O')
+    }
+  }
 }
 
