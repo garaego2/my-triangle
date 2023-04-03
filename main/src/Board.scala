@@ -26,5 +26,4 @@ class Board {
     this.placesOnBoard(5) = Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
   }
 
-
 }
