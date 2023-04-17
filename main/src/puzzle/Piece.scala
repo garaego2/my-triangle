@@ -1,10 +1,12 @@
+package puzzle
+
 class Piece(val left: Char, val bottom: Char, val right: Char, private var pos: Int) {
   private var coords: Option[(Int, Int)] = None
   def position = this.pos
 
-  def getCoords = this.coords.getOrElse(-1, -1)
+  def getCoords = this.coords.getOrElse((-1, -1))
 
-  def addCoords(y: Int, x: Int) = this.coords = Some(y, x)
+  def addCoords(y: Int, x: Int) = this.coords = Some((y, x))
 
   def removeCoords() = this.coords = None
 

@@ -1,3 +1,5 @@
+package puzzle
+
 import scala.collection.mutable.Buffer
 
 class PiecesStack {
