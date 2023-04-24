@@ -155,64 +155,6 @@ class Game {
     }
   }
 
-  def getHelp() = {
-
-    def addCorrectPiece(piece: Piece) = {
-          for {
-            i <- this.sol.indices
-            j <- this.sol(i).indices
-          } {
-            val solPiece = this.sol(i)(j).get
-            if (solPiece.samePiece(piece)) {
-              val coords = solPiece.getCoords
-              val pieceOnBoard = this.board.pieceOnCoords(coords._2, coords._1)
-              if (pieceOnBoard.isDefined) {
-                this.board.removePiece(pieceOnBoard.get)
-                this.pile.addPiece(pieceOnBoard.get)
-              }
-              this.board.addPiece(piece, coords._2, coords._1)
-              this.pile.takePiece(piece)
-              while (piece.position != solPiece.position) { piece.rotate() }
-            }
-          }
-    }
-
-
-    if (this.gameStarted) {
-
-
-      for {
-        i <- this.sol.indices
-        j <- this.sol(i).indices
-      } {
-        val solPiece = this.sol(i)(j).get
-        val boardPiece = this.board.getBoard(i)(j)
-        if (boardPiece.isDefined) {
-          val piece = boardPiece.get
-          if (piece.samePiece(solPiece)) { while (piece.position != solPiece.position) { piece.rotate() } }
-          else {
-            this.board.removePiece(piece)
-            this.pile.addPiece(piece)
-          }
-        }
-      }
-
-
-      if (this.pile.size >= 3) {
-        for (n <- 1 to 3) {
-          val piece = this.pile.piecePile.head
-          addCorrectPiece(piece)
-        }
-      } else {
-
-        if (this.pile.size >= 1) {
-          val piece = this.pile.piecePile.head
-          addCorrectPiece(piece)
-        }
-      }
-    }
-  }
-
   def correctSides(p: Piece, l: Char, u: Char): Boolean = {
     val converted = p.convertPos
     (this.matchingSymbol(l) == converted._1 || l == 'x') && (this.matchingSymbol(u) == converted._3 || u == 'x')
@@ -396,7 +338,6 @@ class Game {
       }
 
     }
-
 
     for (i <- pieceStack.indices) {
       if (i <= 4) { this.board.addPiece(pieceStack(i)._1, i + 1, 1) }

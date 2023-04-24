@@ -26,7 +26,7 @@ class Board {
     this.placesOnBoard(4) = Array(0, 0, 2, 1, 2, 1, 2, 0, 0)
     this.placesOnBoard(5) = Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
   }
-    def addPiece(p: Piece, x: Int, y: Int): Boolean = {
+    def addPiece(p: Piece, x: Int, y: Int) = {
     if (y >= 1 && y <= 4) {
       if ((y == 1 || y == 4) && (x >= 1 && x <= 5) && this.board(y)(x + 1).isEmpty) {
         if (y == 1 && (x == 1 || x == 3 || x == 5) && p.position%2 == 0) p.rotate()
@@ -50,7 +50,7 @@ class Board {
     } else { false }
   }
 
-  def removePiece(p: Piece): Boolean = {
+  def removePiece(p: Piece) = {
     val n =
       for {
         i <- this.board.indices
