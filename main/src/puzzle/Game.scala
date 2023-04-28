@@ -7,7 +7,7 @@ class Game {
   val board = new Board
   val pile = new PiecesStack
 
-  val piecePlaces = board.placesOnBoard
+  private val piecePlaces = board.placesOnBoard
 
   private var sol = Array.ofDim[Option[Piece]](6, 9)
 
@@ -58,50 +58,58 @@ class Game {
     }
   }
 
-  private def generateSolution() = {
-
-    var existingPieces = Buffer[Piece]()
-
+  private def generateSolution(): Unit = {
+    var existingPieces: Buffer[Piece] = Buffer[Piece]()
     this.solInit()
 
-    def pieceExists(p: Piece) = {
-      existingPieces.exists( _.samePiece(p) )
-    }
+    def pieceExists(piece: Piece): Boolean = {
+      existingPieces.exists(_.samePiece(piece))
+  }
 
-    for {
-      i <- this.sol.indices
-      j <- this.sol(i).indices
-    } {
-      var piece = this.board.padPiece
-      do {
-        if (this.piecePlaces(i)(j) == 1) {
-          piece = this.generatePiece(this.sol(i)(j - 1).get, this.sol(i)(j + 1).get, this.sol(i - 1)(j).get, this.sol(i + 1)(j).get, 1)
-        }
-        if (this.piecePlaces(i)(j) == 2) {
-          piece = this.generatePiece(this.sol(i)(j - 1).get, this.sol(i)(j + 1).get, this.sol(i - 1)(j).get, this.sol(i + 1)(j).get, 2)
-        }
-      } while (pieceExists(piece))
-
-      if (this.piecePlaces(i)(j) != 0) {
-        this.sol(i)(j) = Some(piece)
-        if (i == 1 || i == 4) {
-          piece.addCoords(i, j - 1)
-        } else {
-          piece.addCoords(i, j)
-        }
-        existingPieces += new Piece(piece.left, piece.right, piece.bottom, piece.position)
+  for {
+    rowIndex <- this.sol.indices
+    colIndex <- this.sol(rowIndex).indices
+  } {
+    var piece = this.board.padPiece
+    do {
+      if (this.piecePlaces(rowIndex)(colIndex) == 1) {
+        piece = this.generatePiece(
+          this.sol(rowIndex)(colIndex - 1).get,
+          this.sol(rowIndex)(colIndex + 1).get,
+          this.sol(rowIndex - 1)(colIndex).get,
+          this.sol(rowIndex + 1)(colIndex).get,
+          1
+        )
       }
+      if (this.piecePlaces(rowIndex)(colIndex) == 2) {
+        piece = this.generatePiece(
+          this.sol(rowIndex)(colIndex - 1).get,
+          this.sol(rowIndex)(colIndex + 1).get,
+          this.sol(rowIndex - 1)(colIndex).get,
+          this.sol(rowIndex + 1)(colIndex).get,
+          2
+        )
+      }
+    } while (pieceExists(piece))
 
-    }
-
-    for (i <- 1 to 24) {
-      val shuffled = Random.shuffle(existingPieces)
-      shuffled.foreach( _.rotate() )
-      this.pile.addPiece(shuffled.head)
-      existingPieces = shuffled.tail
+    if (this.piecePlaces(rowIndex)(colIndex) != 0) {
+      this.sol(rowIndex)(colIndex) = Some(piece)
+      if (rowIndex == 1 || rowIndex == 4) {
+        piece.addCoords(rowIndex, colIndex - 1)
+      } else {
+        piece.addCoords(rowIndex, colIndex)
+      }
+      existingPieces += new Piece(piece.left, piece.right, piece.bottom, piece.position)
     }
   }
 
+  for (_ <- 1 to 24) {
+    val shuffledPieces = Random.shuffle(existingPieces)
+    shuffledPieces.foreach(_.rotate())
+    this.pile.addPiece(shuffledPieces.head)
+    existingPieces = shuffledPieces.tail
+  }
+}
   def startGame() = {
     if (!this.gameStarted) {
       this.generateSolution()
@@ -150,20 +158,18 @@ class Game {
         }
       }
 
-      if (this.board.isEmpty && this.pile.isEmpty) this.generateSolution
+      if (this.board.isEmpty && this.pile.isEmpty) this.generateSolution()
       this.gameStarted = true
     }
   }
 
-  def correctSides(p: Piece, l: Char, u: Char): Boolean = {
+  private def correctSides(p: Piece, l: Char, u: Char): Boolean = {
     val converted = p.convertPos
     (this.matchingSymbol(l) == converted._1 || l == 'x') && (this.matchingSymbol(u) == converted._3 || u == 'x')
   }
 
 
   private def solutionFound: Boolean = {
-
-
     if (this.board.isFull) {
       val solFound = Buffer[Boolean]()
       for {
@@ -244,11 +250,7 @@ class Game {
 
 
   def solveGame() = {
-
-
     var pieceStack = Buffer[(Piece, Int)]()
-
-
     var usedIndices = Buffer[Int]()
 
     if (!this.board.isEmpty) {
@@ -264,18 +266,22 @@ class Game {
       }
     }
 
+    def getSymbolValues(index: Int): (Char, Char) = {
+      val leftSymbol: Char = if (index == 0 || index == 5 || index == 12 || index == 19) { 'x'
+  }     else {
+          pieceStack(index - 1)._1.convertPos._2
+  }
 
-    def valuesForSymbols(i: Int) = {
-      val leftS = if (i == 0 || i == 5 || i == 12 || i == 19) { 'x' } else { pieceStack(i - 1)._1.convertPos._2 }
-      val upS = if (i <= 5 || i == 11) { 'x' }
-        else {
-          if ((i >= 6 && i <= 10) || (i >= 19 && i <= 23)) { pieceStack(i - 6)._1.convertPos._4 }
-          else { pieceStack(i - 7)._1.convertPos._4}
-        }
-
-      (leftS, upS)
+    val upSymbol: Char = if (index <= 5 || index == 11) { 'x'
+  }   else {
+      if ((index >= 6 && index <= 10) || (index >= 19 && index <= 23)) {
+        pieceStack(index - 6)._1.convertPos._4
+    }   else {
+          pieceStack(index - 7)._1.convertPos._4
     }
-
+  }
+    (leftSymbol, upSymbol)
+}
 
     def valueForPos(i: Int) = {
       if (i == 0 || i == 2 || i == 4 || i == 20 || i == 22 || (i >= 5 && i <= 18 && i%2 == 1)) 1 else 0
@@ -303,8 +309,8 @@ class Game {
           }
           stackIndex += 1
           position = valueForPos(stackIndex)
-          symbolL = valuesForSymbols(stackIndex)._1
-          symbolU = valuesForSymbols(stackIndex)._2
+          symbolL = getSymbolValues(stackIndex)._1
+          symbolU = getSymbolValues(stackIndex)._2
           pileIndex = 0
           current = this.pile.pieceOnIndex(pileIndex)
         } else {
@@ -319,8 +325,8 @@ class Game {
               if (popped._2 > last) { last = popped._2 }
             } while (popped._2 >= last)
             position = valueForPos(stackIndex)
-            symbolL = valuesForSymbols(stackIndex)._1
-            symbolU = valuesForSymbols(stackIndex)._2
+            symbolL = getSymbolValues(stackIndex)._1
+            symbolU = getSymbolValues(stackIndex)._2
             pileIndex = popped._2 + 1
             current = this.pile.pieceOnIndex(pileIndex)
 
@@ -338,7 +344,6 @@ class Game {
       }
 
     }
-
     for (i <- pieceStack.indices) {
       if (i <= 4) { this.board.addPiece(pieceStack(i)._1, i + 1, 1) }
       if (i >= 5 && i <= 11) { this.board.addPiece(pieceStack(i)._1, i - 4, 2) }

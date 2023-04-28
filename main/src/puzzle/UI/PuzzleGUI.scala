@@ -13,12 +13,12 @@ object PuzzleGUI extends SimpleSwingApplication {
 
   // The dimensions of the game window.
   val screenDimension = Toolkit.getDefaultToolkit.getScreenSize
-  val (width, height) = (Toolkit.getDefaultToolkit.getScreenSize.getWidth.toInt,
+  private val (width, height) = (Toolkit.getDefaultToolkit.getScreenSize.getWidth.toInt,
     Toolkit.getDefaultToolkit.getScreenSize.getHeight.toInt)
   val windowSize = new Dimension(width, height)
 
   // The game and the stack and the board of the game.
-  val game = new Game
+  private val game = new Game
   val board = game.board
   val stack = game.pile
 
@@ -32,42 +32,42 @@ object PuzzleGUI extends SimpleSwingApplication {
   }
 
   // Define variables for mouse movement coordinates.
-  var movedPiece: Option[Piece] = None
-  var startCoords = (0, 0)
-  var movedCoords = (0, 0)
+  private var movedPiece: Option[Piece] = None
+  private var startCoords = (0, 0)
+  private var movedCoords = (0, 0)
 
   // Define the dimensions and coordinates for the board background.
-  val (w1, h1, coords1) = (5 * width / 9, 3 * height / 4, (3 * width / 8, height / 8))
+  private val (w1, h1, coords1) = (5 * width / 9, 3 * height / 4, (3 * width / 8, height / 8))
 
   // Define the dimensions and coordinates for the stack background.
-  val (w2, coords2, h2) = (7 * width / 32, (3 * width / 32, height / 8), 3 * height / 4)
+  private val (w2, coords2, h2) = (7 * width / 32, (3 * width / 32, height / 8), 3 * height / 4)
 
   // Define the coordinates for the corners of the board.
-  val boardCorner1 = (coords1._1 + 50 , coords1._2 + h1 / 2)
-  val boardCorner4 = (coords1._1 + w1 - 50, coords1._2 + h1 / 2)
+  private val boardCorner1 = (coords1._1 + 50 , coords1._2 + h1 / 2)
+  private val boardCorner4 = (coords1._1 + w1 - 50, coords1._2 + h1 / 2)
 
   // Define the side and diameter of a triangle piece.
-  val side = (boardCorner4._1 - boardCorner1._1) / 4.0
-  val diameter = side * 1.0 / math.sqrt(2)
+  private val side = (boardCorner4._1 - boardCorner1._1) / 4.0
+  private val diameter = side * 1.0 / math.sqrt(2)
 
-  val boardCorner2 = (boardCorner1._1 + side.toInt, boardCorner1._2 - (2 * diameter).toInt)
-  val boardCorner3 = (boardCorner2._1 + (2 * side).toInt, boardCorner2._2)
-  val boardCorner5 = (boardCorner3._1, boardCorner1._2 + (2 * diameter).toInt)
-  val boardCorner6 = (boardCorner2._1, boardCorner5._2)
-  val boardCorner12 = (boardCorner1._1 + ((boardCorner2._1 - boardCorner1._1) / 2.0).toInt, boardCorner2._2 + ((boardCorner1._2 - boardCorner2._2) / 2.0).toInt)
-  val boardCorner23 = (boardCorner2._1 + side.toInt, boardCorner2._2)
+  private val boardCorner2 = (boardCorner1._1 + side.toInt, boardCorner1._2 - (2 * diameter).toInt)
+  private val boardCorner3 = (boardCorner2._1 + (2 * side).toInt, boardCorner2._2)
+  private val boardCorner5 = (boardCorner3._1, boardCorner1._2 + (2 * diameter).toInt)
+  private val boardCorner6 = (boardCorner2._1, boardCorner5._2)
+  private val boardCorner12 = (boardCorner1._1 + ((boardCorner2._1 - boardCorner1._1) / 2.0).toInt, boardCorner2._2 + ((boardCorner1._2 - boardCorner2._2) / 2.0).toInt)
+  private val boardCorner23 = (boardCorner2._1 + side.toInt, boardCorner2._2)
 
    // The scaled images for the background of the triangle pieces and the board
-  val bgorg = ImageIO.read(new File("/Users/egor/IdeaProjects/my-triangle-puzzle/main/src/resources/background.png"))
-  val bgImg = bgorg.getScaledInstance(width, height, Image.SCALE_DEFAULT)
-  val triangleorg = ImageIO.read(new File("/Users/egor/IdeaProjects/my-triangle-puzzle/main/src/resources/triangle.png"))
-  val triangleUpImg = triangleorg.getScaledInstance(side.toInt, diameter.toInt, Image.SCALE_DEFAULT)
-  val triangledownorg = ImageIO.read(new File("/Users/egor/IdeaProjects/my-triangle-puzzle/main/src/resources/triangledown.png"))
-  val triangleDownImg = triangledownorg.getScaledInstance(side.toInt, diameter.toInt, Image.SCALE_DEFAULT)
+  private val bgorg = ImageIO.read(new File("/Users/egor/IdeaProjects/my-triangle-puzzle/main/src/resources/background.png"))
+  private val bgImg = bgorg.getScaledInstance(width, height, Image.SCALE_DEFAULT)
+  private val triangleorg = ImageIO.read(new File("/Users/egor/IdeaProjects/my-triangle-puzzle/main/src/resources/triangle.png"))
+  private val triangleUpImg = triangleorg.getScaledInstance(side.toInt, diameter.toInt, Image.SCALE_DEFAULT)
+  private val triangledownorg = ImageIO.read(new File("/Users/egor/IdeaProjects/my-triangle-puzzle/main/src/resources/triangledown.png"))
+  private val triangleDownImg = triangledownorg.getScaledInstance(side.toInt, diameter.toInt, Image.SCALE_DEFAULT)
 
 
-  // Draws the background for the game and the game board and the pieces for the stack and the board as well as the moving piece.
-  def onPaint(g: Graphics2D) = {
+  // Draws the background for the game, the game board, the pieces for the stack, the board as well as the moving piece.
+   private def onPaint(g: Graphics2D) = {
     g.drawImage(bgImg, 0, 0, null)
     g.setColor(new Color(255, 250, 250))
     g.fillRect(coords1._1, coords1._2, w1, h1)
@@ -93,23 +93,24 @@ object PuzzleGUI extends SimpleSwingApplication {
 
     // Draws the piece on top of the stack and the symbols on its sides
     val currentPiece = stack.currentPiece.getOrElse(board.padPiece)
-    val font2 = new Font("Arial", java.awt.Font.BOLD, w2 / 24)
+    val font2 = new Font("Times New Roman", java.awt.Font.BOLD, w2 / 24)
     g.setColor(new Color(255, 250, 250))
     g.setFont(font2)
     if (!currentPiece.samePiece(board.padPiece)) {
       val symbols = currentPiece.convertPos
       val centerY = coords2._2 + (h2 / 2)
       val centerX = coords2._1 + (w2 / 5) + 5
-      if (currentPiece.position%2 == 1) {
+
+      if (currentPiece.position % 2 != 1) {
+        g.drawImage(triangleDownImg, centerX, centerY, null)
+        g.drawString(symbols._1.toString, centerX + (side / 4).toInt + 15, centerY + (diameter / 2).toInt)  //left
+        g.drawString(symbols._2.toString, centerX + (side * 3 / 4).toInt - 20, centerY + (diameter / 2).toInt)  //right
+        g.drawString(symbols._3.toString, centerX + (side / 2).toInt, centerY + 25)  //top
+      } else {
         g.drawImage(triangleUpImg, centerX, centerY, null)
         g.drawString(symbols._1.toString, centerX + (side / 4).toInt + 20, centerY+ (diameter / 2).toInt)  //left
         g.drawString(symbols._2.toString, centerX + (side * 3 / 4).toInt - 30, centerY+ (diameter / 2).toInt)  //right
         g.drawString(symbols._4.toString, centerX + (side / 2).toInt, centerY+ diameter.toInt - 15)  //bottom
-      } else {
-        g.drawImage(triangleDownImg, centerX, centerY, null)
-        g.drawString(symbols._1.toString, centerX + (side / 4).toInt + 15, centerY+ (diameter / 2).toInt)  //left
-        g.drawString(symbols._2.toString, centerX + (side * 3 / 4).toInt - 20, centerY+ (diameter / 2).toInt)  //right
-        g.drawString(symbols._3.toString, centerX + (side / 2).toInt, centerY+ 25)  //top
       }
     }
 
@@ -122,37 +123,37 @@ object PuzzleGUI extends SimpleSwingApplication {
       val y11 = boardCorner2._2
       val x21 = boardCorner1._1
       val y21 = boardCorner1._2 - diameter.toInt
-      val addedX = (side / 2)
-      val addedY = diameter
+      val added_x = (side / 2)
+      val added_y = diameter
       val piece = board.getBoard(i)(j).getOrElse(board.padPiece)
 
       if (!piece.samePiece(board.padPiece)) {
         val symbols = piece.convertPos
-        if (piece.position%2 == 1) {
+        if (piece.position % 2 == 1) {
           if (i == 1 || i == 4) {
-            g.drawImage(triangleUpImg, x11 + ((j - 2) * addedX).toInt, y11 + ((i - 1) * addedY).toInt, null)
-            g.drawString(symbols._1.toString, x11 + ((j - 2) * addedX).toInt + (side / 4).toInt + 20, y11 + ((i - 1) * addedY).toInt + (diameter / 2).toInt)  //left
-            g.drawString(symbols._2.toString, x11 + ((j - 2) * addedX).toInt + (side * 3 / 4).toInt - 30, y11 + ((i - 1) * addedY).toInt + (diameter / 2).toInt)  //right
-            g.drawString(symbols._4.toString, x11 + ((j - 2) * addedX).toInt + (side / 2).toInt, y11 + ((i - 1) * addedY).toInt + diameter.toInt - 15)  //bottom
+            g.drawImage(triangleUpImg, x11 + ((j - 2) * added_x).toInt, y11 + ((i - 1) * added_y).toInt, null)
+            g.drawString(symbols._1.toString, x11 + ((j - 2) * added_x).toInt + (side / 4).toInt + 20, y11 + ((i - 1) * added_y).toInt + (diameter / 2).toInt)  //left
+            g.drawString(symbols._2.toString, x11 + ((j - 2) * added_x).toInt + (side * 3 / 4).toInt - 30, y11 + ((i - 1) * added_y).toInt + (diameter / 2).toInt)  //right
+            g.drawString(symbols._4.toString, x11 + ((j - 2) * added_x).toInt + (side / 2).toInt, y11 + ((i - 1) * added_y).toInt + diameter.toInt - 15)  //bottom
           }
           if (i == 2 || i == 3) {
-            g.drawImage(triangleUpImg, x21 + ((j - 1) * addedX).toInt, y21 + ((i - 2) * addedY).toInt, null)
-            g.drawString(symbols._1.toString, x21 + ((j - 1) * addedX).toInt + (side / 4).toInt + 20, y21 + ((i - 2) * addedY).toInt + (diameter / 2).toInt)  //left
-            g.drawString(symbols._2.toString, x21 + ((j - 1) * addedX).toInt + (side * 3 / 4).toInt - 30, y21 + ((i - 2) * addedY).toInt + (diameter / 2).toInt)  //right
-            g.drawString(symbols._4.toString, x21 + ((j - 1) * addedX).toInt + (side / 2).toInt, y21 + ((i - 2) * addedY).toInt + diameter.toInt - 15)  //bottom
+            g.drawImage(triangleUpImg, x21 + ((j - 1) * added_x).toInt, y21 + ((i - 2) * added_y).toInt, null)
+            g.drawString(symbols._1.toString, x21 + ((j - 1) * added_x).toInt + (side / 4).toInt + 20, y21 + ((i - 2) * added_y).toInt + (diameter / 2).toInt)  //left
+            g.drawString(symbols._2.toString, x21 + ((j - 1) * added_x).toInt + (side * 3 / 4).toInt - 30, y21 + ((i - 2) * added_y).toInt + (diameter / 2).toInt)  //right
+            g.drawString(symbols._4.toString, x21 + ((j - 1) * added_x).toInt + (side / 2).toInt, y21 + ((i - 2) * added_y).toInt + diameter.toInt - 15)  //bottom
           }
         } else {
           if (i == 1 || i == 4) {
-            g.drawImage(triangleDownImg, x11 + ((j - 2) * addedX).toInt, y11 + ((i - 1) * addedY).toInt, null)
-            g.drawString(symbols._1.toString, x11 + ((j - 2) * addedX).toInt + (side / 4).toInt + 15, y11 + ((i - 1) * addedY).toInt + (diameter / 2).toInt)  //left
-            g.drawString(symbols._2.toString, x11 + ((j - 2) * addedX).toInt + (side * 3 / 4).toInt - 20, y11 + ((i - 1) * addedY).toInt + (diameter / 2).toInt)  //right
-            g.drawString(symbols._3.toString, x11 + ((j - 2) * addedX).toInt + (side / 2).toInt, y11 + ((i - 1) * addedY).toInt + 25)  //top
+            g.drawImage(triangleDownImg, x11 + ((j - 2) * added_x).toInt, y11 + ((i - 1) * added_y).toInt, null)
+            g.drawString(symbols._1.toString, x11 + ((j - 2) * added_x).toInt + (side / 4).toInt + 15, y11 + ((i - 1) * added_y).toInt + (diameter / 2).toInt)  //left
+            g.drawString(symbols._2.toString, x11 + ((j - 2) * added_x).toInt + (side * 3 / 4).toInt - 20, y11 + ((i - 1) * added_y).toInt + (diameter / 2).toInt)  //right
+            g.drawString(symbols._3.toString, x11 + ((j - 2) * added_x).toInt + (side / 2).toInt, y11 + ((i - 1) * added_y).toInt + 25)  //top
           }
           if (i == 2 || i == 3) {
-            g.drawImage(triangleDownImg, x21 + ((j - 1) * addedX).toInt, y21 + ((i - 2) * addedY).toInt, null)
-            g.drawString(symbols._1.toString, x21 + ((j - 1) * addedX).toInt + (side / 4).toInt + 15, y21 + ((i - 2) * addedY).toInt + (diameter / 2).toInt)  //left
-            g.drawString(symbols._2.toString, x21 + ((j - 1) * addedX).toInt + (side * 3 / 4).toInt - 20, y21 + ((i - 2) * addedY).toInt + (diameter / 2).toInt)  //right
-            g.drawString(symbols._3.toString, x21 + ((j - 1) * addedX).toInt + (side / 2).toInt, y21 + ((i - 2) * addedY).toInt + 25)  //top
+            g.drawImage(triangleDownImg, x21 + ((j - 1) * added_x).toInt, y21 + ((i - 2) * added_y).toInt, null)
+            g.drawString(symbols._1.toString, x21 + ((j - 1) * added_x).toInt + (side / 4).toInt + 15, y21 + ((i - 2) * added_y).toInt + (diameter / 2).toInt)  //left
+            g.drawString(symbols._2.toString, x21 + ((j - 1) * added_x).toInt + (side * 3 / 4).toInt - 20, y21 + ((i - 2) * added_y).toInt + (diameter / 2).toInt)  //right
+            g.drawString(symbols._3.toString, x21 + ((j - 1) * added_x).toInt + (side / 2).toInt, y21 + ((i - 2) * added_y).toInt + 25)  //top
           }
         }
       }
@@ -162,75 +163,82 @@ object PuzzleGUI extends SimpleSwingApplication {
     val moved = movedPiece.getOrElse(board.padPiece)
     if (!moved.samePiece(board.padPiece)) {
       val symbols = moved.convertPos
-      if (moved.position%2 == 1) {
-        g.drawImage(triangleUpImg, movedCoords._1, movedCoords._2, null)
-        g.drawString(symbols._1.toString, movedCoords._1 + (side / 4).toInt + 20, movedCoords._2 + (diameter / 2).toInt)  //left
-        g.drawString(symbols._2.toString, movedCoords._1 + (side * 3 / 4).toInt - 30, movedCoords._2 + (diameter / 2).toInt)  //right
-        g.drawString(symbols._4.toString, movedCoords._1 + (side / 2).toInt, movedCoords._2 + diameter.toInt - 15)  //bottom
-      } else {
+      if (moved.position % 2 != 1) {
         g.drawImage(triangleDownImg, movedCoords._1, movedCoords._2, null)
         g.drawString(symbols._1.toString, movedCoords._1 + (side / 4).toInt + 15, movedCoords._2 + (diameter / 2).toInt)  //left
         g.drawString(symbols._2.toString, movedCoords._1 + (side * 3 / 4).toInt - 20, movedCoords._2 + (diameter / 2).toInt)  //right
         g.drawString(symbols._3.toString, movedCoords._1 + (side / 2).toInt, movedCoords._2 + 25)  //top
+      } else {
+        g.drawImage(triangleUpImg, movedCoords._1, movedCoords._2, null)
+        g.drawString(symbols._1.toString, movedCoords._1 + (side / 4).toInt + 20, movedCoords._2 + (diameter / 2).toInt)  //left
+        g.drawString(symbols._2.toString, movedCoords._1 + (side * 3 / 4).toInt - 30, movedCoords._2 + (diameter / 2).toInt)  //right
+        g.drawString(symbols._4.toString, movedCoords._1 + (side / 2).toInt, movedCoords._2 + diameter.toInt - 15)  //bottom
       }
     }
-
   }
 
   // Converts the coords on the screen given in pixels to match the indexes in the board array
-  def convertCoords(x: Int, y: Int): (Int, Int) = {
+  private def convertCoords(x: Int, y: Int): (Int, Int) = {
     val x11 = boardCorner2._1 - (side / 2).toInt
     val y11 = boardCorner2._2
-    val x11Side = x11 + (side / 4).toInt
-    val y11Side = y11 + (diameter / 2).toInt
-    val addedX = (side / 2)
-    val addedY = (diameter / 2)
+    val x11_side = x11 + (side / 4).toInt
+    val y11_side = y11 + (diameter / 2).toInt
+    val added_x = (side / 2)
+    val added_y = (diameter / 2)
+    
+    if (y >= y11_side && y <= (y11_side + added_y.toInt))
+        if (x >= x11_side && x <= (x11_side + added_x.toInt)) (1, 2) else
+          if (x >= (x11_side + (2 * added_x).toInt) && x <= (x11_side + (3 * added_x).toInt)) (1, 4) else
+            if (x >= (x11_side + (4 * added_x).toInt) && x <= (x11_side + (5 * added_x).toInt)) (1, 6) else
+              (-1, -1)
 
-    if (y >= y11Side && y <= (y11Side + addedY.toInt))
-        if (x >= x11Side && x <= (x11Side + addedX.toInt)) (1, 2) else //(y, x)
-          if (x >= (x11Side + (2 * addedX).toInt) && x <= (x11Side + (3 * addedX).toInt)) (1, 4) else
-            if (x >= (x11Side + (4 * addedX).toInt) && x <= (x11Side + (5 * addedX).toInt)) (1, 6) else (-1, -1)
+    else if (y >= y11 && y <= y11_side)
+        if (x >= (x11_side + added_x.toInt) && x <= (x11_side + (2 * added_x).toInt)) (1, 3) else
+          if (x >= (x11_side + (3 * added_x).toInt) && x <= (x11_side + (4 * added_x).toInt)) (1, 5) else
+            (-1, -1)
 
-    else if (y >= y11 && y <= y11Side)
-        if (x >= (x11Side + addedX.toInt) && x <= (x11Side + (2 * addedX).toInt)) (1, 3) else
-          if (x >= (x11Side + (3 * addedX).toInt) && x <= (x11Side + (4 * addedX).toInt)) (1, 5) else (-1, -1)
+    else if (y >= (y11_side + (2 * added_y).toInt) && y <= (y11_side + (3 * added_y).toInt))
+        if (x >= (x11_side - added_x.toInt) && x <= x11_side) (2, 1) else
+          if (x >= (x11_side + added_x.toInt) && x <= (x11_side + (2 * added_x).toInt)) (2, 3) else
+            if (x >= (x11_side + (3 * added_x).toInt) && x <= (x11_side + (4 * added_x).toInt)) (2, 5) else
+              if (x >= (x11_side + (5 * added_x).toInt) && x <= (x11_side + (6 * added_x).toInt)) (2, 7) else
+                (-1, -1)
 
-    else if (y >= (y11Side + (2 * addedY).toInt) && y <= (y11Side + (3 * addedY).toInt))
-        if (x >= (x11Side - addedX.toInt) && x <= x11Side) (2, 1) else
-          if (x >= (x11Side + addedX.toInt) && x <= (x11Side + (2 * addedX).toInt)) (2, 3) else
-            if (x >= (x11Side + (3 * addedX).toInt) && x <= (x11Side + (4 * addedX).toInt)) (2, 5) else
-              if (x >= (x11Side + (5 * addedX).toInt) && x <= (x11Side + (6 * addedX).toInt)) (2, 7) else (-1, -1)
+    else if (y >= (y11_side + added_y.toInt) && y <= (y11_side + (2 * added_y).toInt))
+        if (x >= x11_side && x <= (x11_side + added_x.toInt)) (2, 2) else
+          if (x >= (x11_side + (2 * added_x).toInt) && x <= (x11_side + (3 * added_x).toInt)) (2, 4) else
+            if (x >= (x11_side + (4 * added_x).toInt) && x <= (x11_side + (5 * added_x).toInt)) (2, 6) else
+              (-1, -1)
 
-    else if (y >= (y11Side + addedY.toInt) && y <= (y11Side + (2 * addedY).toInt))
-        if (x >= x11Side && x <= (x11Side + addedX.toInt)) (2, 2) else
-          if (x >= (x11Side + (2 * addedX).toInt) && x <= (x11Side + (3 * addedX).toInt)) (2, 4) else
-            if (x >= (x11Side + (4 * addedX).toInt) && x <= (x11Side + (5 * addedX).toInt)) (2, 6) else  (-1, -1)
+    else if (y >= (y11_side + (3 * added_y).toInt) && y <= (y11_side + (4 * added_y).toInt))
+        if (x >= (x11_side - added_x.toInt) && x <= x11_side) (3, 1) else
+          if (x >= (x11_side + added_x.toInt) && x <= (x11_side + (2 * added_x).toInt)) (3, 3) else
+            if (x >= (x11_side + (3 * added_x).toInt) && x <= (x11_side + (4 * added_x).toInt)) (3, 5) else
+              if (x >= (x11_side + (5 * added_x).toInt) && x <= (x11_side + (6 * added_x).toInt)) (3, 7) else
+                (-1, -1)
 
-    else if (y >= (y11Side + (3 * addedY).toInt) && y <= (y11Side + (4 * addedY).toInt))
-        if (x >= (x11Side - addedX.toInt) && x <= x11Side) (3, 1) else
-          if (x >= (x11Side + addedX.toInt) && x <= (x11Side + (2 * addedX).toInt)) (3, 3) else
-            if (x >= (x11Side + (3 * addedX).toInt) && x <= (x11Side + (4 * addedX).toInt)) (3, 5) else
-              if (x >= (x11Side + (5 * addedX).toInt) && x <= (x11Side + (6 * addedX).toInt)) (3, 7) else (-1, -1)
+    else if (y >= (y11_side + (4 * added_y).toInt) && y <= (y11_side + (5 * added_y).toInt))
+        if (x >= x11_side && x <= (x11_side + added_x.toInt)) (3, 2) else
+          if (x >= (x11_side + (2 * added_x).toInt) && x <= (x11_side + (3 * added_x).toInt)) (3, 4) else
+            if (x >= (x11_side + (4 * added_x).toInt) && x <= (x11_side + (5 * added_x).toInt)) (3, 6) else
+              (-1, -1)
 
-    else if (y >= (y11Side + (4 * addedY).toInt) && y <= (y11Side + (5 * addedY).toInt))
-        if (x >= x11Side && x <= (x11Side + addedX.toInt)) (3, 2) else
-          if (x >= (x11Side + (2 * addedX).toInt) && x <= (x11Side + (3 * addedX).toInt)) (3, 4) else
-            if (x >= (x11Side + (4 * addedX).toInt) && x <= (x11Side + (5 * addedX).toInt)) (3, 6) else (-1, -1)
+    else if (y >= (y11_side + (5 * added_y).toInt) && y <= (y11_side + (6 * added_y).toInt))
+        if (x >= x11_side && x <= (x11_side + added_x.toInt)) (4, 2) else
+          if (x >= (x11_side + (2 * added_x).toInt) && x <= (x11_side + (3 * added_x).toInt)) (4, 4) else
+            if (x >= (x11_side + (4 * added_x).toInt) && x <= (x11_side + (5 * added_x).toInt)) (4, 6) else
+              (-1, -1)
 
-    else if (y >= (y11Side + (5 * addedY).toInt) && y <= (y11Side + (6 * addedY).toInt))
-        if (x >= x11Side && x <= (x11Side + addedX.toInt)) (4, 2) else
-          if (x >= (x11Side + (2 * addedX).toInt) && x <= (x11Side + (3 * addedX).toInt)) (4, 4) else
-            if (x >= (x11Side + (4 * addedX).toInt) && x <= (x11Side + (5 * addedX).toInt)) (4, 6) else (-1, -1)
-
-    else if (y >= (y11Side + (6 * addedY).toInt) && y <= (y11Side + (7 * addedY).toInt))
-        if (x >= (x11Side + addedX.toInt) && x <= (x11Side + (2 * addedX).toInt)) (4, 3) else
-          if (x >= (x11Side + (3 * addedX).toInt) && x <= (x11Side + (4 * addedX).toInt)) (4, 5) else (-1, -1)
+    else if (y >= (y11_side + (6 * added_y).toInt) && y <= (y11_side + (7 * added_y).toInt))
+        if (x >= (x11_side + added_x.toInt) && x <= (x11_side + (2 * added_x).toInt)) (4, 3) else
+          if (x >= (x11_side + (3 * added_x).toInt) && x <= (x11_side + (4 * added_x).toInt)) (4, 5) else
+            (-1, -1)
 
     else (-1, -1)
   }
 
-  // Called when mouse is clicked, if this occurs on the stack or on a piece on the board, the piece is rotated
-  def onPress(x: Int, y: Int) = {
+  // Called when mouse is pressed, if this occurs on the stack or on a piece on the board, the piece is rotated
+  private def onPress(x: Int, y: Int) = {
     val stackY = coords2._2 + (h2 / 2)
     val stackX = coords2._1 + (w2 / 5) + 5
 
@@ -242,7 +250,7 @@ object PuzzleGUI extends SimpleSwingApplication {
       }
     }
 
-    // Rotate the piece on the board if the click occurs within the bounds of a piece on the board
+    // Rotate the symbols on the piece, if the click occurs within the bounds of a piece on the board
     val converted = convertCoords(x, y)
     if (converted._1 != -1) {
       val current = board.getBoard(converted._1)(converted._2).getOrElse(board.padPiece)
@@ -253,8 +261,8 @@ object PuzzleGUI extends SimpleSwingApplication {
     }
   }
 
-  // Called when a mouse is movedUpdates the value of movedPiece, the piece that is currently moved
-  def onMove(x: Int, y: Int) = {
+  // Called when a mouse is moved, also updates the value of movedPiece, the piece that is currently moved
+  private def onMove(x: Int, y: Int) = {
     val stackY = coords2._2 + (h2 / 2)
     val stackX = coords2._1 + (w2 / 5) + 5
 
@@ -280,13 +288,13 @@ object PuzzleGUI extends SimpleSwingApplication {
   }
 
   // Called when the mouse is released
-  def onRelease(x: Int, y: Int): Unit = {
+  private def onRelease(x: Int, y: Int): Unit = {
     val stackY = coords2._2 + (h2 / 2)
     val stackX = coords2._1 + (w2 / 5) + 5
     val current = movedPiece.getOrElse(board.padPiece)
     val converted = convertCoords(x, y)
 
-    // The start coords are on top of the stack, if the end coords are wrong, the piece is added back to the stack
+    // If the end coordinates are wrong, the piece is added back to the stack
     if ((startCoords._1 >= stackX && startCoords._1 <= (stackX + side)) && (startCoords._2 >= stackY && startCoords._2 <= (stackY + diameter))) {
       if (converted._1 != -1) {
         if (!current.samePiece(board.padPiece) && movedPiece.isDefined) {
@@ -335,77 +343,78 @@ object PuzzleGUI extends SimpleSwingApplication {
           }
         }
       }
+
     }
   }
 
-  // The class for the main panel, it contains all of the buttons and listens to them and the mouse
-  class MainPanel extends BoxPanel(Orientation.Vertical) {
+  // Main Panel, contains all of the buttons and listens to them and the mouse
+  private class MainPanel extends BoxPanel(Orientation.Vertical) {
 
     // Draws the image
     override def paintComponent(g: Graphics2D) = {
       onPaint(g)
     }
 
-    val button1Dim = new Dimension(w2 / 3, h2 / 16)
-    val button2Dim = new Dimension(w2 / 5, h2 / 16)
-    val buttonFont = new Font("Arial", java.awt.Font.PLAIN, w2 / 28)
+    private val actionDim = new Dimension(w2 / 3, h2 / 16)
+    private val directionDim = new Dimension(w2 / 5, h2 / 16)
+    private val buttonFont = new Font("Arial", java.awt.Font.PLAIN, w2 / 28)
 
     // The buttons
-    val newGame = new Button {
+    private val newGame = new Button {
       text = "New game"
       font = buttonFont
-      minimumSize = button1Dim
-      preferredSize = button1Dim
-      maximumSize = button1Dim
+      minimumSize = actionDim
+      preferredSize = actionDim
+      maximumSize = actionDim
     }
-    val continue = new Button {
+    private val continue = new Button {
       font = buttonFont
       text = "Continue game"
-      minimumSize = button1Dim
-      preferredSize = button1Dim
-      maximumSize = button1Dim
+      minimumSize = actionDim
+      preferredSize = actionDim
+      maximumSize = actionDim
     }
-    val save = new Button {
+    private val save = new Button {
       font = buttonFont
-      text = "Save and close"
-      minimumSize = button1Dim
-      preferredSize = button1Dim
-      maximumSize = button1Dim
+      text = "Save"
+      minimumSize = actionDim
+      preferredSize = actionDim
+      maximumSize = actionDim
     }
-    val next = new Button {
-      text = ">"
-      minimumSize = button2Dim
-      preferredSize = button2Dim
-      maximumSize = button2Dim
+    private val next = new Button {
+      text = "->"
+      minimumSize = directionDim
+      preferredSize = directionDim
+      maximumSize = directionDim
     }
-    val previous = new Button {
-      text = "<"
-      minimumSize = button2Dim
-      preferredSize = button2Dim
-      maximumSize = button2Dim
+    private val previous = new Button {
+      text = "<-"
+      minimumSize = directionDim
+      preferredSize = directionDim
+      maximumSize = directionDim
     }
 
-    // Creates the structure of the main frame by combining panels
-    val buttons11 = new BoxPanel(Orientation.Horizontal) {
+    // Combining panels into one structure
+    private val buttons11 = new BoxPanel(Orientation.Horizontal) {
       contents += Swing.HStrut(3 * width / 32 + 3 * width / 100)
       contents += newGame
       contents += Swing.HStrut(2 * width / 100)
       contents += continue
       background = new Color(0, 0, 0, 0)
     }
-    val buttons12 = new BoxPanel(Orientation.Horizontal) {
+    private val buttons12 = new BoxPanel(Orientation.Horizontal) {
       contents += Swing.HStrut(3 * width / 32 + 3 * width / 100)
       contents += Swing.HStrut(2 * width / 100)
       contents += save
       background = new Color(0, 0, 0, 0)
     }
-    val buttons1 = new BoxPanel(Orientation.Vertical) {
+    private val buttons1 = new BoxPanel(Orientation.Vertical) {
       contents += buttons11
       contents += Swing.VStrut(-1 * height / 3 + 3 * height / 100)
       contents += buttons12
       background = new Color(0, 0, 0, 0)
     }
-    val buttons2 = new BoxPanel(Orientation.Horizontal) {
+    private val buttons2 = new BoxPanel(Orientation.Horizontal) {
       contents += Swing.HStrut(4 * width / 32 + 2 * width / 100)
       contents += previous
       contents += Swing.HStrut(3 * width / 100)
@@ -426,106 +435,100 @@ object PuzzleGUI extends SimpleSwingApplication {
     }
 
     // Pop-up windows
-    def startMessage(): Unit = {
-      val text = "Welcome to the Triangle Puzzle! You started a new gameThese are the rules: \n" +
-      "You must solve the puzzle by dragging and matching the sides of pieces: uppercase to lowercase and vice versa \n" +
-      "You can click on the arrows to flip through the stack of pieces and click on the piece on top to rotate it\n" +
-      "You can save your game and continue it later by pressing on the 'Save and close' buttonWhen you then wish to continue the game \n" +
-      "open the app again and press on 'Continue game'\n"
+    private def startMessage(): Unit = {
+      val text = "Welcome to the Triangle Puzzle! You started a new game. These are the rules: \n" +
+      "You must solve the puzzle by dragging and matching the sides of pieces: uppercase to lowercase and vice versa. \n" +
+      "You can click on the arrows to flip through the stack of pieces and click on the piece on top to rotate it.\n" +
+      "You can save your game and continue it later by pressing on the 'Save' button, which will close the game. \n" +
+      "When you want to continue the game open the app again and click on 'Continue game'\n"
 
-      Dialog.showMessage(contents(1), text, title="Game started")
+      Dialog.showMessage(contents(1), text, title= "Game started")
     }
-    def continueMessage(): Unit = {
+    private def continueMessage(): Unit = {
       val text = "The last saved game was continued"
-      Dialog.showMessage(contents(1), text, title="Game continued")
+      Dialog.showMessage(contents(1), text, title= "Game continued")
     }
-
-    def saveMessage(): Unit = {
-      val text = "The game was successfully saved\n Do you want to close the app?"
-      val res = Dialog.showConfirmation(contents(1), text, optionType=Dialog.Options.YesNo, title="Game saved")
-      if (res == Dialog.Result.Yes) { sys.exit(0) }
+    private def saveMessage(): Unit = {
+      val text = "The game was successfully saved"
+      val res = Dialog.showConfirmation(contents(1), text, title= "Game saved")
     }
-    def endMessage(): Unit = {
-      val text = "Congratulations! You solved the puzzle successfully!"
+    private def endMessage(): Unit = {
+      val text = "Congratulations! You solved the puzzle!"
       Dialog.showMessage(contents(1), text, title="Puzzle solved")
       game.endGame()
       repaint()
     }
 
-    // Listens to the buttons and the mouseAt first, only listens to the buttons new game and continue
+    // Listens to the buttons new game and continue at the beginning
     listenTo(newGame)
     listenTo(continue)
 
-    // Reacts to the buttons and mouse
-    reactions += {
-      case ButtonClicked(`newGame`) =>
-        game.startGame()
-        listenTo(save)
-        listenTo(next)
-        listenTo(previous)
-        listenTo(mouse.clicks)
-        listenTo(mouse.moves)
-        deafTo(newGame)
-        deafTo(continue)
-        repaint()
-        startMessage()
-      case ButtonClicked(`continue`) =>
-        val gameSituation = FileOperations.readFromFile("gameFile.txt")
-        game.continueGame(gameSituation._1, gameSituation._2, gameSituation._3)
-        listenTo(save)
-        listenTo(next)
-        listenTo(previous)
-        listenTo(mouse.clicks)
-        listenTo(mouse.moves)
-        deafTo(newGame)
-        deafTo(continue)
-        repaint()
-        continueMessage()
-      case ButtonClicked(`save`) =>
-        FileOperations.writeToFile("gameFile.txt", board.getBoard, stack.pieceStack, game.solution)
-        saveMessage()
-      case ButtonClicked(`next`) =>
-        stack.flipRight()
-        repaint()
-      case ButtonClicked(`previous`) =>
-        stack.flipLeft()
-        repaint()
-      case MouseClicked(_, p, _, _, _) =>
-        onPress(p.x, p.y)
-        repaint()
-        if (game.gameOver) {
-          listenTo(newGame)
-          listenTo(continue)
-          deafTo(save)
-          deafTo(next)
-          deafTo(previous)
-          deafTo(mouse.clicks)
-          deafTo(mouse.moves)
-          endMessage()
-        }
-      case MousePressed(_, p, _, _, _) =>
-        startCoords = (p.x, p.y)
-      case MouseDragged(_, p, _) =>
-        onMove(p.x, p.y)
-        movedCoords = (p.x - (side / 2).toInt, p.y - (diameter / 2).toInt)
-        repaint()
-      case MouseReleased(_, p, _, _, _) =>
-        onRelease(p.x, p.y)
-        repaint()
-        movedPiece = None
-        movedCoords = (0, 0)
-        startCoords = (0, 0)
-        if (game.gameOver) {
-          listenTo(newGame)
-          listenTo(continue)
-          deafTo(save)
-          deafTo(next)
-          deafTo(previous)
-          deafTo(mouse.clicks)
-          deafTo(mouse.moves)
-          endMessage()
-        }
-    }
-  }
-
+    // Starts to listen to actions
+    private def addGameListeners(): Unit = {
+      listenTo(save, next, previous, mouse.clicks, mouse.moves)
+      deafTo(newGame, continue)
 }
+
+  //Stops cartain functions when activated
+    private def addEndGameListeners(): Unit = {
+      listenTo(newGame, continue)
+      deafTo(save, next, previous, mouse.clicks, mouse.moves)
+}
+  // When buttons are clicked
+  reactions += {
+  case ButtonClicked(`newGame`) =>
+    game.startGame()
+    addGameListeners()
+    deafTo(newGame, continue)
+    repaint()
+    startMessage()
+
+  case ButtonClicked(`continue`) =>
+    val gameSituation = FileOps.readFromFile("gameFile.txt")
+    game.continueGame(gameSituation._1, gameSituation._2, gameSituation._3)
+    addGameListeners()
+    deafTo(newGame, continue)
+    repaint()
+    continueMessage()
+
+  case ButtonClicked(`save`) =>
+    FileOps.writeToFile("gameFile.txt", board.getBoard, stack.pieceStack, game.solution)
+    saveMessage()
+
+  case ButtonClicked(`next`) =>
+    stack.flipRight()
+    repaint()
+
+  case ButtonClicked(`previous`) =>
+    stack.flipLeft()
+    repaint()
+
+  case MouseClicked(_, p, _, _, _) =>
+    onPress(p.x, p.y)
+    repaint()
+    if (game.gameOver) {
+      addEndGameListeners()
+      endMessage()
+    }
+
+  case MousePressed(_, p, _, _, _) =>
+    startCoords = (p.x, p.y)
+
+  case MouseDragged(_, p, _) =>
+    onMove(p.x, p.y)
+    movedCoords = (p.x - (side / 2).toInt, p.y - (diameter / 2).toInt)
+    repaint()
+
+  case MouseReleased(_, p, _, _, _) =>
+    onRelease(p.x, p.y)
+    repaint()
+    movedPiece = None
+    movedCoords = (0, 0)
+    startCoords = (0, 0)
+    if (game.gameOver) {
+      addEndGameListeners()
+      endMessage()
+    }
+   }
+  }
+ }

@@ -18,6 +18,7 @@ class Board {
       this.board(i)(j) = None
     }
   }
+
   private def addPlaces() = {
     this.placesOnBoard(0) = Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
     this.placesOnBoard(1) = Array(0, 0, 1, 2, 1, 2, 1, 0, 0)
@@ -45,25 +46,24 @@ class Board {
           this.board(y)(x) = Some(p)
           p.addCoords(y, x)
           true
-        } else { false }
+        } else false
       }
-    } else { false }
+    } else false
   }
 
-  def removePiece(p: Piece) = {
-    val n =
-      for {
-        i <- this.board.indices
-        j <- this.board(i).indices
-        if (this.board(i)(j) == Some(p))
+  def removePiece(piece: Piece) = {
+    val x =
+      for {i <- this.board.indices
+           j <- this.board(i).indices
+        if (this.board(i)(j) == Some(piece))
       } yield (i, j)
-    val coords = n.headOption.getOrElse((-1, -1))
+    val coords = x.headOption.getOrElse((-1, -1))
 
-    if (coords != (-1, -1) && !p.samePiece(this.padPiece)) {
+    if (coords != (-1, -1) && !piece.samePiece(this.padPiece)) {
       this.board(coords._1)(coords._2) = None
-      p.removeCoords()
+      piece.removeCoords()
       true
-    } else { false }
+    } else false
   }
 
 
@@ -77,7 +77,6 @@ class Board {
       if ((i == 2 || i == 3) && (j == 0 || j == 8)) { this.board(i)(j) = Some(this.padPiece) }
     }
     this.addPlaces()
-
   }
 
   this.init()
@@ -85,7 +84,6 @@ class Board {
   def getBoard = this.board.clone
 
   def rows = this.board.length
-
   def columns = this.board(0).length
 
   def pieceOnCoords(x: Int, y: Int): Option[Piece] = {
@@ -93,9 +91,7 @@ class Board {
       if ((y == 1 || y == 4) && (x >= 1 && x <= 5)) this.board(y)(x + 1)
       else if ((y == 2 || y == 3) && (x >= 1 && x <= 7)) this.board(y)(x)
       else None
-    } else {
-      None
-    }
-  }
+    } else None
 
+}
 }

@@ -3,12 +3,13 @@ package puzzle
 import java.io._
 import scala.collection.mutable.Buffer
 
-object FileOperations {
+object FileOps {
 
-  /* Takes as parameters a filename, an array of the situation on the board, a vector of the pile, and
+  /* Takes as parameters a filename, an array of the situation on the board, a vector of the stack, and
    * an array of the solution for the game. Writes the information from these collections to a file. If
    * a file with the file name does not exist, it creates a new file with that name. */
-  def writeToFile(fileName: String, gameSituation: Array[Array[Option[Piece]]], pile: Vector[Piece], gameSolution: Array[Array[Option[Piece]]]) = {
+  
+  def writeToFile(fileName: String, gameSituation: Array[Array[Option[Piece]]], stack: Vector[Piece], gameSolution: Array[Array[Option[Piece]]]) = {
 
     try {
       val fileOut = new FileWriter(fileName)
@@ -47,12 +48,12 @@ object FileOperations {
         linesOut.newLine()
         writeBoardInfo(gameSituation)
 
-        /* Writes all of the pieces in the pile vector on separate rows. */
-        linesOut.write("#PILE")
+        /* Writes all of the pieces in the stack vector on separate rows. */
+        linesOut.write("#stack")
         linesOut.newLine()
-        for (i <- pile.indices) {
+        for (i <- stack.indices) {
           var string = ""
-          val onePiece = pile(i)
+          val onePiece = stack(i)
           string += onePiece.left
           string += onePiece.bottom
           string += onePiece.right
@@ -81,7 +82,7 @@ object FileOperations {
 
   /* Takes as a parameter a name of a file and reads the information from that file. If the file does
    * not exist, returns an exception. If the reading was successfull, returns a tuple with an array
-   * for the board, a buffer for the pile and an array for the solution. */
+   * for the board, a buffer for the stack and an array for the solution. */
   def readFromFile(fileName: String): (Array[Array[Option[Piece]]], Buffer[Piece], Array[Array[Option[Piece]]]) = {
     try {
       val fileIn = new FileReader(fileName)
@@ -93,7 +94,7 @@ object FileOperations {
         var header = ""
         var subHeader = ""
         var arr = Array.fill[Option[Piece]](6, 9)(Some(new Piece('x', 'x', 'x', 1)))
-        val pile = Buffer[Piece]()
+        val stack = Buffer[Piece]()
         var sol = Array.fill[Option[Piece]](6, 9)(Some(new Piece('x', 'x', 'x', 1)))
 
         if (currentLine.toLowerCase startsWith "#game") {
@@ -146,34 +147,34 @@ object FileOperations {
           if (currentLine.toLowerCase startsWith "#board") {
             subHeader = "#board"
           }
-          if (currentLine.toLowerCase startsWith "#pile") {
-            subHeader = "#pile"
+          if (currentLine.toLowerCase startsWith "#stack") {
+            subHeader = "#stack"
           }
           if (currentLine.toLowerCase startsWith "#solution") {
             subHeader = "#solution"
           }
 
-          /* Reads the information for the board. */
+          // Reads the information for the board
           if (header == "#game" && subHeader == "#board" && !(currentLine.toLowerCase startsWith "#") && !currentLine.equals("")) {
             readBoardInfo(currentLine, arr)
           }
 
-          /* Reads the information for the pile. */
-          if (header == "#game" && subHeader == "#pile" && !(currentLine.toLowerCase startsWith "#") && !currentLine.equals("")) {
+          // Reads the information for the stack
+          if (header == "#game" && subHeader == "#stack" && !(currentLine.toLowerCase startsWith "#") && !currentLine.equals("")) {
             val info = currentLine.trim
             val pie = piece(info)
-            pile += pie
+            stack += pie
           }
 
-          /* Reads the information for the solution. */
+          // Reads the information for the solution.
           if (header == "#game" && subHeader == "#solution" && !(currentLine.toLowerCase startsWith "#") && !currentLine.equals("")) {
             readBoardInfo(currentLine, sol)
           }
 
         }
 
-       /* Returns the board, pile and solution. */
-       (arr, pile, sol)
+       // Returns the board, stack and solution
+       (arr, stack, sol)
 
       } finally {
         linesIn.close()
@@ -181,7 +182,7 @@ object FileOperations {
       }
 
     } catch {
-      /* Catches exceptions in reading from the file. */
+      // Catches exceptions in reading from the file
       case notFound: FileNotFoundException => {
         println("File not found")
         (Array(Array(None)), Buffer(), Array(Array(None)))
