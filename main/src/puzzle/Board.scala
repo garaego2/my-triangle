@@ -27,6 +27,12 @@ class Board {
     this.placesOnBoard(4) = Array(0, 0, 2, 1, 2, 1, 2, 0, 0)
     this.placesOnBoard(5) = Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
   }
+  /* Adds a piece on the board. The method returns a Boolean value that tells whether the piece has
+   * successfully been added or not. A piece can only be added on the board meaning that the y
+   * value can vary between 1 and 4, and the x value between 1 and 5 if y=1 or y=4, or between 1 and 7
+   * if y=2 or y=3. The method also returns false if a piece is added to a position that already contains a piece.
+   * In each position the triangles can be either tip upwards or tip downwards depending on the position.
+   * The method rotates the pieces to the closest suitable position if they are already not correctly positioned. */
     def addPiece(p: Piece, x: Int, y: Int) = {
     if (y >= 1 && y <= 4) {
       if ((y == 1 || y == 4) && (x >= 1 && x <= 5) && this.board(y)(x + 1).isEmpty) {
@@ -50,7 +56,7 @@ class Board {
       }
     } else false
   }
-
+  // Removes piece
   def removePiece(piece: Piece) = {
     val x =
       for {i <- this.board.indices
@@ -66,7 +72,9 @@ class Board {
     } else false
   }
 
-
+/* Creates padding around the board since the board is not square. Padding makes it easier to handle
+   * the separate positions on the board without having to separately handle the positions on the edges.
+   * The padding consists of pieces Piece('x', 'x', 'x', 1), where all of the sides have the char 'x'. */
   private def init() = {
     for {
       i <- this.board.indices
@@ -78,7 +86,6 @@ class Board {
     }
     this.addPlaces()
   }
-
   this.init()
 
   def getBoard = this.board.clone

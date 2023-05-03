@@ -20,7 +20,7 @@ object PuzzleGUI extends SimpleSwingApplication {
   // The game and the stack and the board of the game.
   private val game = new Game
   val board = game.board
-  val stack = game.pile
+  val stack = game.stack
 
    // The main frame.
   def top: MainFrame = new MainFrame {
@@ -74,44 +74,54 @@ object PuzzleGUI extends SimpleSwingApplication {
     g.fillRect(coords2._1, coords2._2, w2, h2)
 
     // Draws the lines for the board.
+    val (x1, y1) = boardCorner12
+    val (x2, y2) = boardCorner23
+    val (x3, y3) = boardCorner1
+    val (x4, y4) = boardCorner2
+    val (x5, y5) = boardCorner3
+    val (x6, y6) = boardCorner4
+    val (x7, y7) = boardCorner5
+    val (x8, y8) = boardCorner6
+
     g.setColor(Color.black)
-    g.drawLine(boardCorner12._1, boardCorner12._2, boardCorner12._1 + (3 * side).toInt, boardCorner12._2)
-    g.drawLine(boardCorner12._1, boardCorner12._2 + (2 * diameter).toInt, boardCorner12._1 + (3 * side).toInt, boardCorner12._2 + (2 * diameter).toInt)
-    g.drawLine(boardCorner12._1, boardCorner12._2, boardCorner23._1, boardCorner23._2 + (4 * diameter).toInt)
-    g.drawLine(boardCorner23._1, boardCorner23._2, boardCorner12._1 + (3 * side).toInt, boardCorner12._2 + (2 * diameter).toInt)
-    g.drawLine(boardCorner23._1, boardCorner23._2, boardCorner12._1, boardCorner12._2 + (2 * diameter).toInt)
-    g.drawLine(boardCorner23._1, boardCorner23._2 + (4 * diameter).toInt, boardCorner12._1 + (3 * side).toInt, boardCorner12._2)
-    g.drawLine(boardCorner1._1, boardCorner1._2, boardCorner2._1, boardCorner2._2)
-    g.drawLine(boardCorner1._1, boardCorner1._2, boardCorner4._1, boardCorner4._2)
-    g.drawLine(boardCorner1._1, boardCorner1._2, boardCorner6._1, boardCorner6._2)
-    g.drawLine(boardCorner2._1, boardCorner2._2, boardCorner3._1, boardCorner3._2)
-    g.drawLine(boardCorner2._1, boardCorner2._2, boardCorner5._1, boardCorner5._2)
-    g.drawLine(boardCorner3._1, boardCorner3._2, boardCorner4._1, boardCorner4._2)
-    g.drawLine(boardCorner3._1, boardCorner3._2, boardCorner6._1, boardCorner6._2)
-    g.drawLine(boardCorner4._1, boardCorner4._2, boardCorner5._1, boardCorner5._2)
-    g.drawLine(boardCorner5._1, boardCorner5._2, boardCorner6._1, boardCorner6._2)
+    g.drawLine(x1, y1, x1 + (3 * side).toInt, y1)
+    g.drawLine(x1, y1 + (2 * diameter).toInt, x1 + (3 * side).toInt, y1 + (2 * diameter).toInt)
+    g.drawLine(x1, y1, x2, y2 + (4 * diameter).toInt)
+    g.drawLine(x2, y2, x1 + (3 * side).toInt, y1 + (2 * diameter).toInt)
+    g.drawLine(x2, y2, x1, y1 + (2 * diameter).toInt)
+    g.drawLine(x2, y2 + (4 * diameter).toInt, x1 + (3 * side).toInt, y1)
+
+    g.drawLine(x3, y3, x4, y4)
+    g.drawLine(x3, y3, x6, y6)
+    g.drawLine(x3, y3, x8, y8)
+    g.drawLine(x4, y4, x5, y5)
+    g.drawLine(x4, y4, x7, y7)
+    g.drawLine(x5, y5, x6, y6)
+    g.drawLine(x5, y5, x8, y8)
+    g.drawLine(x6, y6, x7, y7)
+    g.drawLine(x7, y7, x8, y8)
+
 
     // Draws the piece on top of the stack and the symbols on its sides
     val currentPiece = stack.currentPiece.getOrElse(board.padPiece)
     val font2 = new Font("Times New Roman", java.awt.Font.BOLD, w2 / 24)
     g.setColor(new Color(255, 250, 250))
     g.setFont(font2)
+
     if (!currentPiece.samePiece(board.padPiece)) {
       val symbols = currentPiece.convertPos
       val centerY = coords2._2 + (h2 / 2)
       val centerX = coords2._1 + (w2 / 5) + 5
+      val img = if (currentPiece.position % 2 != 1) triangleDownImg else triangleUpImg
 
+      g.drawImage(img, centerX, centerY, null)
+      g.drawString(symbols._1.toString, centerX + (side / 4).toInt + (if (img == triangleDownImg) 15 else 20), centerY + (diameter / 2).toInt) //left
+      g.drawString(symbols._2.toString, centerX + (side * 3 / 4).toInt - (if (img == triangleDownImg) 20 else 30), centerY + (diameter / 2).toInt) //right
       if (currentPiece.position % 2 != 1) {
-        g.drawImage(triangleDownImg, centerX, centerY, null)
-        g.drawString(symbols._1.toString, centerX + (side / 4).toInt + 15, centerY + (diameter / 2).toInt)  //left
-        g.drawString(symbols._2.toString, centerX + (side * 3 / 4).toInt - 20, centerY + (diameter / 2).toInt)  //right
-        g.drawString(symbols._3.toString, centerX + (side / 2).toInt, centerY + 25)  //top
-      } else {
-        g.drawImage(triangleUpImg, centerX, centerY, null)
-        g.drawString(symbols._1.toString, centerX + (side / 4).toInt + 20, centerY+ (diameter / 2).toInt)  //left
-        g.drawString(symbols._2.toString, centerX + (side * 3 / 4).toInt - 30, centerY+ (diameter / 2).toInt)  //right
-        g.drawString(symbols._4.toString, centerX + (side / 2).toInt, centerY+ diameter.toInt - 15)  //bottom
-      }
+        g.drawString(symbols._3.toString, centerX + (side / 2).toInt, centerY + 25) //top
+    } else {
+        g.drawString(symbols._4.toString, centerX + (side / 2).toInt, centerY + diameter.toInt - 15)  //bottom
+     }
     }
 
     // Draws the pieces that are currently on the board
@@ -119,119 +129,88 @@ object PuzzleGUI extends SimpleSwingApplication {
       i <- 0 until board.rows
       j <- 0 until board.columns
     } {
-      val x11 = boardCorner2._1 - (side / 2).toInt
-      val y11 = boardCorner2._2
-      val x21 = boardCorner1._1
-      val y21 = boardCorner1._2 - diameter.toInt
-      val added_x = (side / 2)
-      val added_y = diameter
+      val (x11, y11) = (boardCorner2._1 - (side / 2).toInt, boardCorner2._2)
+      val (x21, y21) = (boardCorner1._1, boardCorner1._2 - diameter.toInt)
+      val (added_x, added_y) = ((side / 2), diameter)
       val piece = board.getBoard(i)(j).getOrElse(board.padPiece)
 
       if (!piece.samePiece(board.padPiece)) {
         val symbols = piece.convertPos
-        if (piece.position % 2 == 1) {
-          if (i == 1 || i == 4) {
-            g.drawImage(triangleUpImg, x11 + ((j - 2) * added_x).toInt, y11 + ((i - 1) * added_y).toInt, null)
-            g.drawString(symbols._1.toString, x11 + ((j - 2) * added_x).toInt + (side / 4).toInt + 20, y11 + ((i - 1) * added_y).toInt + (diameter / 2).toInt)  //left
-            g.drawString(symbols._2.toString, x11 + ((j - 2) * added_x).toInt + (side * 3 / 4).toInt - 30, y11 + ((i - 1) * added_y).toInt + (diameter / 2).toInt)  //right
-            g.drawString(symbols._4.toString, x11 + ((j - 2) * added_x).toInt + (side / 2).toInt, y11 + ((i - 1) * added_y).toInt + diameter.toInt - 15)  //bottom
-          }
-          if (i == 2 || i == 3) {
-            g.drawImage(triangleUpImg, x21 + ((j - 1) * added_x).toInt, y21 + ((i - 2) * added_y).toInt, null)
-            g.drawString(symbols._1.toString, x21 + ((j - 1) * added_x).toInt + (side / 4).toInt + 20, y21 + ((i - 2) * added_y).toInt + (diameter / 2).toInt)  //left
-            g.drawString(symbols._2.toString, x21 + ((j - 1) * added_x).toInt + (side * 3 / 4).toInt - 30, y21 + ((i - 2) * added_y).toInt + (diameter / 2).toInt)  //right
-            g.drawString(symbols._4.toString, x21 + ((j - 1) * added_x).toInt + (side / 2).toInt, y21 + ((i - 2) * added_y).toInt + diameter.toInt - 15)  //bottom
-          }
-        } else {
-          if (i == 1 || i == 4) {
-            g.drawImage(triangleDownImg, x11 + ((j - 2) * added_x).toInt, y11 + ((i - 1) * added_y).toInt, null)
-            g.drawString(symbols._1.toString, x11 + ((j - 2) * added_x).toInt + (side / 4).toInt + 15, y11 + ((i - 1) * added_y).toInt + (diameter / 2).toInt)  //left
-            g.drawString(symbols._2.toString, x11 + ((j - 2) * added_x).toInt + (side * 3 / 4).toInt - 20, y11 + ((i - 1) * added_y).toInt + (diameter / 2).toInt)  //right
-            g.drawString(symbols._3.toString, x11 + ((j - 2) * added_x).toInt + (side / 2).toInt, y11 + ((i - 1) * added_y).toInt + 25)  //top
-          }
-          if (i == 2 || i == 3) {
-            g.drawImage(triangleDownImg, x21 + ((j - 1) * added_x).toInt, y21 + ((i - 2) * added_y).toInt, null)
-            g.drawString(symbols._1.toString, x21 + ((j - 1) * added_x).toInt + (side / 4).toInt + 15, y21 + ((i - 2) * added_y).toInt + (diameter / 2).toInt)  //left
-            g.drawString(symbols._2.toString, x21 + ((j - 1) * added_x).toInt + (side * 3 / 4).toInt - 20, y21 + ((i - 2) * added_y).toInt + (diameter / 2).toInt)  //right
-            g.drawString(symbols._3.toString, x21 + ((j - 1) * added_x).toInt + (side / 2).toInt, y21 + ((i - 2) * added_y).toInt + 25)  //top
-          }
-        }
+        val img = if (piece.position % 2 == 1) triangleUpImg else triangleDownImg
+        val x = if (i == 1 || i == 4) x11 + ((j - 2) * added_x).toInt else x21 + ((j - 1) * added_x).toInt
+        val y = if (i == 1 || i == 4) y11 + ((i - 1) * added_y).toInt else y21 + ((i - 2) * added_y).toInt
+
+      g.drawImage(img, x, y, null)
+      g.drawString(symbols._1.toString, x + (side / 4).toInt + (if (piece.position % 2 == 1) 20 else 15), y + (diameter / 2).toInt)
+      g.drawString(symbols._2.toString, x + (side * 3 / 4).toInt - (if (piece.position % 2 == 1) 30 else 20), y + (diameter / 2).toInt)
+      if (piece.position % 2 == 1) {
+        g.drawString(symbols._4.toString, x + (side / 2).toInt, y + diameter.toInt - 15)
+      } else {
+        g.drawString(symbols._3.toString, x + (side / 2).toInt, y + 25)
       }
+     }
     }
 
     // Draws the piece that is being moved
-    val moved = movedPiece.getOrElse(board.padPiece)
-    if (!moved.samePiece(board.padPiece)) {
-      val symbols = moved.convertPos
-      if (moved.position % 2 != 1) {
-        g.drawImage(triangleDownImg, movedCoords._1, movedCoords._2, null)
-        g.drawString(symbols._1.toString, movedCoords._1 + (side / 4).toInt + 15, movedCoords._2 + (diameter / 2).toInt)  //left
-        g.drawString(symbols._2.toString, movedCoords._1 + (side * 3 / 4).toInt - 20, movedCoords._2 + (diameter / 2).toInt)  //right
-        g.drawString(symbols._3.toString, movedCoords._1 + (side / 2).toInt, movedCoords._2 + 25)  //top
-      } else {
-        g.drawImage(triangleUpImg, movedCoords._1, movedCoords._2, null)
-        g.drawString(symbols._1.toString, movedCoords._1 + (side / 4).toInt + 20, movedCoords._2 + (diameter / 2).toInt)  //left
-        g.drawString(symbols._2.toString, movedCoords._1 + (side * 3 / 4).toInt - 30, movedCoords._2 + (diameter / 2).toInt)  //right
-        g.drawString(symbols._4.toString, movedCoords._1 + (side / 2).toInt, movedCoords._2 + diameter.toInt - 15)  //bottom
+     movedPiece.foreach { moved =>
+     val symbols = moved.convertPos
+     val img = if (moved.position % 2 != 1) triangleDownImg else triangleUpImg
+      g.drawImage(img, movedCoords._1, movedCoords._2, null)
+      g.drawString(symbols._1.toString, movedCoords._1 + (side / 4).toInt + (if (img == triangleDownImg) 15 else 20), movedCoords._2 + (diameter / 2).toInt)
+      g.drawString(symbols._2.toString, movedCoords._1 + (side * 3 / 4).toInt - (if (img == triangleDownImg) 20 else 30), movedCoords._2 + (diameter / 2).toInt)
+      if (img == triangleDownImg)
+        g.drawString(symbols._3.toString, movedCoords._1 + (side / 2).toInt, movedCoords._2 + 25)
+      else {
+        if (img == triangleUpImg)
+        g.drawString(symbols._4.toString, movedCoords._1 + (side / 2).toInt, movedCoords._2 + diameter.toInt - 15)
       }
     }
   }
 
   // Converts the coords on the screen given in pixels to match the indexes in the board array
+
   private def convertCoords(x: Int, y: Int): (Int, Int) = {
-    val x11 = boardCorner2._1 - (side / 2).toInt
-    val y11 = boardCorner2._2
-    val x11_side = x11 + (side / 4).toInt
-    val y11_side = y11 + (diameter / 2).toInt
-    val added_x = (side / 2)
-    val added_y = (diameter / 2)
-    
+    val (x11, y11) = (boardCorner2._1 - (side / 2).toInt, boardCorner2._2)
+    val (x11_side, y11_side) = (x11 + (side / 4).toInt, y11 + (diameter / 2).toInt)
+    val (added_x, added_y) = ((side / 2), (diameter / 2))
+    val xtwo = if (x >= x11_side && x <= (x11_side + added_x.toInt)) true
+    val xfour = if (x >= (x11_side + (2 * added_x).toInt) && x <= (x11_side + (3 * added_x).toInt)) true
+    val xsix = if (x >= (x11_side + (4 * added_x).toInt) && x <= (x11_side + (5 * added_x).toInt)) true
+    val xthree = if (x >= (x11_side + added_x.toInt) && x <= (x11_side + (2 * added_x).toInt)) true
+    val xfive = if (x >= (x11_side + (3 * added_x).toInt) && x <= (x11_side + (4 * added_x).toInt)) true
+    val xseven = if (x >= (x11_side + (5 * added_x).toInt) && x <= (x11_side + (6 * added_x).toInt)) true
+    val xone = if (x >= (x11_side - added_x.toInt) && x <= x11_side) true
+
     if (y >= y11_side && y <= (y11_side + added_y.toInt))
-        if (x >= x11_side && x <= (x11_side + added_x.toInt)) (1, 2) else
-          if (x >= (x11_side + (2 * added_x).toInt) && x <= (x11_side + (3 * added_x).toInt)) (1, 4) else
-            if (x >= (x11_side + (4 * added_x).toInt) && x <= (x11_side + (5 * added_x).toInt)) (1, 6) else
+        if (xtwo == true) (1, 2) else if (xfour == true) (1, 4) else if (xsix == true) (1, 6) else
               (-1, -1)
 
     else if (y >= y11 && y <= y11_side)
-        if (x >= (x11_side + added_x.toInt) && x <= (x11_side + (2 * added_x).toInt)) (1, 3) else
-          if (x >= (x11_side + (3 * added_x).toInt) && x <= (x11_side + (4 * added_x).toInt)) (1, 5) else
+        if (xthree == true) (1, 3) else if (xfive == true) (1, 5) else
             (-1, -1)
 
     else if (y >= (y11_side + (2 * added_y).toInt) && y <= (y11_side + (3 * added_y).toInt))
-        if (x >= (x11_side - added_x.toInt) && x <= x11_side) (2, 1) else
-          if (x >= (x11_side + added_x.toInt) && x <= (x11_side + (2 * added_x).toInt)) (2, 3) else
-            if (x >= (x11_side + (3 * added_x).toInt) && x <= (x11_side + (4 * added_x).toInt)) (2, 5) else
-              if (x >= (x11_side + (5 * added_x).toInt) && x <= (x11_side + (6 * added_x).toInt)) (2, 7) else
+        if (xone == true) (2, 1) else if (xthree == true) (2, 3) else if (xfive == true) (2, 5) else if (xseven == true) (2, 7) else
                 (-1, -1)
 
     else if (y >= (y11_side + added_y.toInt) && y <= (y11_side + (2 * added_y).toInt))
-        if (x >= x11_side && x <= (x11_side + added_x.toInt)) (2, 2) else
-          if (x >= (x11_side + (2 * added_x).toInt) && x <= (x11_side + (3 * added_x).toInt)) (2, 4) else
-            if (x >= (x11_side + (4 * added_x).toInt) && x <= (x11_side + (5 * added_x).toInt)) (2, 6) else
+        if (xtwo == true) (2, 2) else if (xfour == true) (2, 4) else if (xsix == true) (2, 6) else
               (-1, -1)
 
     else if (y >= (y11_side + (3 * added_y).toInt) && y <= (y11_side + (4 * added_y).toInt))
-        if (x >= (x11_side - added_x.toInt) && x <= x11_side) (3, 1) else
-          if (x >= (x11_side + added_x.toInt) && x <= (x11_side + (2 * added_x).toInt)) (3, 3) else
-            if (x >= (x11_side + (3 * added_x).toInt) && x <= (x11_side + (4 * added_x).toInt)) (3, 5) else
-              if (x >= (x11_side + (5 * added_x).toInt) && x <= (x11_side + (6 * added_x).toInt)) (3, 7) else
+        if (xone == true) (3, 1) else if (xthree == true) (3, 3) else if (xfive == true) (3, 5) else if (xseven == true) (3, 7) else
                 (-1, -1)
 
     else if (y >= (y11_side + (4 * added_y).toInt) && y <= (y11_side + (5 * added_y).toInt))
-        if (x >= x11_side && x <= (x11_side + added_x.toInt)) (3, 2) else
-          if (x >= (x11_side + (2 * added_x).toInt) && x <= (x11_side + (3 * added_x).toInt)) (3, 4) else
-            if (x >= (x11_side + (4 * added_x).toInt) && x <= (x11_side + (5 * added_x).toInt)) (3, 6) else
+        if (xtwo == true) (3, 2) else if (xfour == true) (3, 4) else if (xsix == true) (3, 6) else
               (-1, -1)
 
     else if (y >= (y11_side + (5 * added_y).toInt) && y <= (y11_side + (6 * added_y).toInt))
-        if (x >= x11_side && x <= (x11_side + added_x.toInt)) (4, 2) else
-          if (x >= (x11_side + (2 * added_x).toInt) && x <= (x11_side + (3 * added_x).toInt)) (4, 4) else
-            if (x >= (x11_side + (4 * added_x).toInt) && x <= (x11_side + (5 * added_x).toInt)) (4, 6) else
+        if (xtwo == true) (4, 2) else if (xfour == true) (4, 4) else if (xsix == true) (4, 6) else
               (-1, -1)
 
     else if (y >= (y11_side + (6 * added_y).toInt) && y <= (y11_side + (7 * added_y).toInt))
-        if (x >= (x11_side + added_x.toInt) && x <= (x11_side + (2 * added_x).toInt)) (4, 3) else
-          if (x >= (x11_side + (3 * added_x).toInt) && x <= (x11_side + (4 * added_x).toInt)) (4, 5) else
+        if (xthree == true) (4, 3) else if (xfive == true) (4, 5) else
             (-1, -1)
 
     else (-1, -1)
@@ -239,8 +218,7 @@ object PuzzleGUI extends SimpleSwingApplication {
 
   // Called when mouse is pressed, if this occurs on the stack or on a piece on the board, the piece is rotated
   private def onPress(x: Int, y: Int) = {
-    val stackY = coords2._2 + (h2 / 2)
-    val stackX = coords2._1 + (w2 / 5) + 5
+    val (stackX, stackY) = (coords2._1 + (w2 / 5) + 5, coords2._2 + (h2 / 2))
 
     // Rotate the piece in the stack if the click occurs within the bounds of the stack
     if ((x >= stackX && x <= (stackX + side)) && (y >= stackY && y <= (stackY + diameter))) {
@@ -263,8 +241,7 @@ object PuzzleGUI extends SimpleSwingApplication {
 
   // Called when a mouse is moved, also updates the value of movedPiece, the piece that is currently moved
   private def onMove(x: Int, y: Int) = {
-    val stackY = coords2._2 + (h2 / 2)
-    val stackX = coords2._1 + (w2 / 5) + 5
+    val (stackX, stackY) = (coords2._1 + (w2 / 5) + 5, coords2._2 + (h2 / 2))
 
     // Check if the moved piece is from the stack.
     if ((startCoords._1 >= stackX && startCoords._1 <= (stackX + side)) && (startCoords._2 >= stackY && startCoords._2 <= (stackY + diameter))) {
@@ -289,15 +266,13 @@ object PuzzleGUI extends SimpleSwingApplication {
 
   // Called when the mouse is released
   private def onRelease(x: Int, y: Int): Unit = {
-    val stackY = coords2._2 + (h2 / 2)
-    val stackX = coords2._1 + (w2 / 5) + 5
+    val (stackX, stackY) = (coords2._1 + (w2 / 5) + 5, coords2._2 + (h2 / 2))
     val current = movedPiece.getOrElse(board.padPiece)
     val converted = convertCoords(x, y)
 
     // If the end coordinates are wrong, the piece is added back to the stack
     if ((startCoords._1 >= stackX && startCoords._1 <= (stackX + side)) && (startCoords._2 >= stackY && startCoords._2 <= (stackY + diameter))) {
-      if (converted._1 != -1) {
-        if (!current.samePiece(board.padPiece) && movedPiece.isDefined) {
+      if (converted._1 != -1 && !current.samePiece(board.padPiece) && movedPiece.isDefined){
           if (converted._1 == 1 || converted._1 == 4) {
             val success = board.addPiece(current, converted._2 - 1, converted._1)
             if (!success) { stack.addPiece(current) }
@@ -306,7 +281,6 @@ object PuzzleGUI extends SimpleSwingApplication {
             val success = board.addPiece(current, converted._2, converted._1)
             if (!success) stack.addPiece(current)
           }
-        }
       } else {
         if (!current.samePiece(board.padPiece)) { stack.addPiece(current) }
       }
@@ -314,9 +288,7 @@ object PuzzleGUI extends SimpleSwingApplication {
     // The start coords are on top of the stack. If the end coords are wrong, the piece is added back to the stack.
     } else {
       val convertedStart = convertCoords(startCoords._1, startCoords._2)
-      if (convertedStart._1 != -1) {
-        if (converted._1 != -1) {
-          if (!current.samePiece(board.padPiece) && movedPiece.isDefined) {
+      if (convertedStart._1 != -1 && converted._1 != -1 && !current.samePiece(board.padPiece) && movedPiece.isDefined) {
             if (converted._1 == 1 || converted._1 == 4) {
               val success = board.addPiece(current, converted._2 - 1, converted._1)
               if (!success) {
@@ -331,7 +303,6 @@ object PuzzleGUI extends SimpleSwingApplication {
                 if (convertedStart._1 == 2 || convertedStart._1 == 3) { board.addPiece(current, convertedStart._2, convertedStart._1) }
               }
             }
-          }
         } else {
           if ((x >= stackX && x <= (stackX + side)) && (y >= stackY && y <= (stackY + diameter))) {
             if (current.left != 'x') { stack.addPiece(current) }
@@ -345,7 +316,7 @@ object PuzzleGUI extends SimpleSwingApplication {
       }
 
     }
-  }
+
 
   // Main Panel, contains all of the buttons and listens to them and the mouse
   private class MainPanel extends BoxPanel(Orientation.Vertical) {
@@ -438,7 +409,7 @@ object PuzzleGUI extends SimpleSwingApplication {
     private def startMessage(): Unit = {
       val text = "Welcome to the Triangle Puzzle! You started a new game. These are the rules: \n" +
       "You must solve the puzzle by dragging and matching the sides of pieces: uppercase to lowercase and vice versa. \n" +
-      "You can click on the arrows to flip through the stack of pieces and click on the piece on top to rotate it.\n" +
+      "You can click on the arrows to swipe through the stack of pieces and click on the piece on top to rotate it.\n" +
       "You can save your game and continue it later by pressing on the 'Save' button, which will close the game. \n" +
       "When you want to continue the game open the app again and click on 'Continue game'\n"
 
@@ -469,7 +440,7 @@ object PuzzleGUI extends SimpleSwingApplication {
       deafTo(newGame, continue)
 }
 
-  //Stops cartain functions when activated
+  //Stops certain functions when activated
     private def addEndGameListeners(): Unit = {
       listenTo(newGame, continue)
       deafTo(save, next, previous, mouse.clicks, mouse.moves)
